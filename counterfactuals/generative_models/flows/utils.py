@@ -5,8 +5,15 @@ from torch.nn import functional as F
 
 
 class Hyperparameters():
-    def __init__(self, base_dim, res_blocks, bottleneck,
-                 skip, weight_norm, coupling_bn, affine, scale_reg):
+    def __init__(self,
+                 base_dim: int,
+                 res_blocks: int,
+                 bottleneck: bool,
+                 skip: bool,
+                 weight_norm: bool,
+                 coupling_bn: bool,
+                 affine: bool,
+                 scale_reg: float):
         """Instantiates a set of hyperparameters used for constructing layers.
 
         Args:

@@ -347,8 +347,7 @@ class Glow(GenerativeModel):
     def __init__(
             self, in_channel, n_flow, n_block, affine=True, conv_lu=True, data_info=None
     ):
-        super().__init__(type="Flow", data_set=data_info["data_set"])
-        self.data_info = data_info
+        super().__init__(g_model_type="Flow", data_info=data_info)
         self.blocks = nn.ModuleList()
         self.n_flow = n_flow
         self.n_block = n_block

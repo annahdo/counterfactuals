@@ -1,18 +1,28 @@
 import abc
 import torch.nn as nn
+from typing import TypeVar, Dict
+
+Tensor = TypeVar('torch.tensor')
+
 
 class GenerativeModel(nn.Module):
-    def __init__(self, type, data_set):
+    """
+    Base class for all generative models (VAEs, GANs, Flows)
+    """
+
+    def __init__(self,
+                 g_model_type: str,
+                 data_info: Dict):
         super().__init__()
 
-        self.type = type
-        self.data_set = data_set
+        self.g_model_type = g_model_type
+        self.data_info = data_info
+        self.data_set = data_info["data_set"]
 
     @abc.abstractmethod
-    def encode(self, x):
+    def encode(self, x: Tensor) -> Tensor:
         pass
 
     @abc.abstractmethod
-    def decode(self, z):
+    def decode(self, z: Tensor) -> Tensor:
         pass
-

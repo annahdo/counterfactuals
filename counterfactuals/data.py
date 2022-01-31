@@ -1,7 +1,12 @@
 import numpy as np
+from typing import Dict
 
 
-def get_data_info(data_set):
+def get_data_info(data_set: str,
+                  normalize: bool = False) -> Dict:
+    """
+    returns information (class names, image shape, ...) about data set as a dictionary
+    """
     n_bits = 8
     temp = 1
     num_classes = 10
@@ -44,6 +49,10 @@ def get_data_info(data_set):
 
         data_mean = np.array([0.5])
         data_std = np.array([0.25])
+
+    if not normalize:
+        data_mean = np.zeros_like(data_mean)
+        data_std = np.ones_like(data_std)
 
     data_info = {'data_set': data_set, 'data_shape': data_shape, 'n_bits': n_bits, 'temp': temp,
                  'num_classes': num_classes, 'class_names': class_names, 'data_mean': data_mean, 'data_std': data_std}

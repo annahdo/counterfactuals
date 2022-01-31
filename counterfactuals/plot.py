@@ -2,6 +2,7 @@ import os
 import numpy as np
 
 import matplotlib as mpl
+from typing import List, Dict
 
 if os.environ.get('DISPLAY', '') == '':
     print('no display found. Using non-interactive Agg backend')
@@ -25,9 +26,13 @@ markers = ['o', '^', 'd']
 linestyles = ['-', ':', '-.', '--', '-', '--', '-.', ':']
 
 
-def plot_grid_part(images, titles=None, images_per_row=3, cmap='gray', norm=mpl.colors.NoNorm()):
+def plot_grid_part(images: List[np.array],
+                   titles: List[str] = None,
+                   images_per_row: int = 3,
+                   cmap: str = 'gray',
+                   norm=mpl.colors.NoNorm()) -> plt.figure:
     """
-    Helper method to plot a grid with matplotlib
+    arrange images in a grid with optional titles
     """
     plt.close("all")
     num_images = len(images)

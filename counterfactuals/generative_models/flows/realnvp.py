@@ -12,6 +12,7 @@ import numpy as np
 import counterfactuals.generative_models.flows.utils as futils
 from counterfactuals.generative_models.base import GenerativeModel
 
+
 class WeightNormConv2d(nn.Module):
     def __init__(self, in_dim, out_dim, kernel_size, stride=1, padding=0,
                  bias=True, weight_norm=True, scale=False):
@@ -552,7 +553,7 @@ class ChannelwiseCoupling(nn.Module):
 
 
 class RealNVP(GenerativeModel):
-    def __init__(self, data_info, prior, hps):
+    def __init__(self, prior, hps, data_info):
         """Initializes a RealNVP.
 
         Args:
@@ -560,8 +561,7 @@ class RealNVP(GenerativeModel):
             prior: prior distribution over latent space Z.
             hps: the set of hyperparameters.
         """
-        super(RealNVP, self).__init__(type="Flow", data_set=data_info["data_set"])
-        self.data_info = data_info
+        super(RealNVP, self).__init__(g_model_type="Flow", data_info=data_info)
         self.prior = prior
         self.hps = hps
 
@@ -569,63 +569,34 @@ class RealNVP(GenerativeModel):
         size = data_info["data_shape"][1]
         dim = hps.base_dim
 
-        if self.data_info["data_set"] == 'CIFAR10':
-            # architecture for CIFAR-10 (down to 16 x 16 x C)
-            # SCALE 1: 3 x 32 x 32
-            self.s1_ckbd = self.checkerboard_combo(chan, dim, size, hps)
-            self.s1_chan = self.channelwise_combo(chan * 4, dim, hps)
-            self.register_buffer("order_matrix_1", self.order_matrix(chan))
-            chan *= 2
-            size //= 2
+        self.s1_ckbd = self.checkerboard_combo(chan, dim, size, hps)
+        self.s1_chan = self.channelwise_combo(chan * 4, dim * 2, hps)
+        self.register_buffer("order_matrix_1", self.order_matrix(chan))
+        chan *= 2
+        size //= 2
+        dim *= 2
 
-            # SCALE 2: 6 x 16 x 16
-            self.s2_ckbd = self.checkerboard_combo(chan, dim, size, hps, final=True)
+        # SCALE 2: 6 x 16(32) x 16(32)
+        self.s2_ckbd = self.checkerboard_combo(chan, dim, size, hps)
+        self.s2_chan = self.channelwise_combo(chan * 4, dim * 2, hps)
+        self.register_buffer("order_matrix_2", self.order_matrix(chan))
+        chan *= 2
+        size //= 2
+        dim *= 2
 
-        else:  # NOTE: can construct with loop (for future edit)
-            # architecture for ImageNet and CelebA (down to 4 x 4 x C)
-            # SCALE 1: 3 x 32(64) x 32(64)
-            self.s1_ckbd = self.checkerboard_combo(chan, dim, size, hps)
-            self.s1_chan = self.channelwise_combo(chan * 4, dim * 2, hps)
-            self.register_buffer("order_matrix_1", self.order_matrix(chan))
-            chan *= 2
-            size //= 2
-            dim *= 2
+        # SCALE 3: 12 x 8(16) x 8(16)
+        self.s3_ckbd = self.checkerboard_combo(chan, dim, size, hps)
+        self.s3_chan = self.channelwise_combo(chan * 4, dim * 2, hps)
+        self.register_buffer("order_matrix_3", self.order_matrix(chan))
+        chan *= 2
+        size //= 2
+        dim *= 2
 
-            # SCALE 2: 6 x 16(32) x 16(32)
-            self.s2_ckbd = self.checkerboard_combo(chan, dim, size, hps)
-            self.s2_chan = self.channelwise_combo(chan * 4, dim * 2, hps)
-            self.register_buffer("order_matrix_2", self.order_matrix(chan))
-            chan *= 2
-            size //= 2
-            dim *= 2
-
-            # SCALE 3: 12 x 8(16) x 8(16)
-            self.s3_ckbd = self.checkerboard_combo(chan, dim, size, hps)
-            self.s3_chan = self.channelwise_combo(chan * 4, dim * 2, hps)
-            self.register_buffer("order_matrix_3", self.order_matrix(chan))
-            chan *= 2
-            size //= 2
-            dim *= 2
-
-            if self.data_info["data_set"] == 'ImageNet32':
-                # SCALE 4: 24 x 4 x 4
-                self.s4_ckbd = self.checkerboard_combo(chan, dim, size, hps, final=True)
-
-            elif self.data_info["data_set"] in ['ImageNet64', 'CelebA']:
-                # SCALE 4: 24 x 8 x 8
-                self.s4_ckbd = self.checkerboard_combo(chan, dim, size, hps)
-                self.s4_chan = self.channelwise_combo(chan * 4, dim * 2, hps)
-                self.register_buffer("order_matrix_4", self.order_matrix(chan))
-                chan *= 2
-                size //= 2
-                dim *= 2
-
-                # SCALE 5: 48 x 4 x 4
-                self.s5_ckbd = self.checkerboard_combo(chan, dim, size, hps, final=True)
 
     def encode(self, x):
         _, _, z_outs = self.forward(x, preprocess_noise=False)
         return z_outs
+
 
     def decode(self, z):
         return self.reverse(z)
@@ -655,6 +626,7 @@ class RealNVP(GenerativeModel):
                 CheckerboardCoupling(in_out_dim, mid_dim, size, 0., hps),
                 CheckerboardCoupling(in_out_dim, mid_dim, size, 1., hps)])
 
+
     def channelwise_combo(self, in_out_dim, mid_dim, hps):
         """Construct a combination of channelwise coupling layers.
 
@@ -669,6 +641,7 @@ class RealNVP(GenerativeModel):
             ChannelwiseCoupling(in_out_dim, mid_dim, 0., hps),
             ChannelwiseCoupling(in_out_dim, mid_dim, 1., hps),
             ChannelwiseCoupling(in_out_dim, mid_dim, 0., hps)])
+
 
     def squeeze(self, x):
         """Squeezes a C x H x W tensor into a 4C x H/2 x W/2 tensor.
@@ -686,6 +659,7 @@ class RealNVP(GenerativeModel):
         x = x.reshape(B, C * 4, H // 2, W // 2)
         return x
 
+
     def undo_squeeze(self, x):
         """unsqueezes a C x H x W tensor into a C/4 x 2H x 2W tensor.
 
@@ -701,6 +675,7 @@ class RealNVP(GenerativeModel):
         x = x.permute(0, 1, 4, 2, 5, 3)
         x = x.reshape(B, C // 4, H * 2, W * 2)
         return x
+
 
     def order_matrix(self, channel):
         """Constructs a matrix that defines the ordering of variables
@@ -731,6 +706,7 @@ class RealNVP(GenerativeModel):
         weights = weights[shuffle, :, :, :].astype('float32')
         return torch.tensor(weights)
 
+
     def factor_out(self, x, order_matrix):
         """Downscales and factors out the bottom half of the tensor.
 
@@ -748,6 +724,7 @@ class RealNVP(GenerativeModel):
         (on, off) = x.split(C // 2, dim=1)
         return on, off
 
+
     def restore(self, on, off, order_matrix):
         """Merges variables and restores their ordering.
 
@@ -762,6 +739,7 @@ class RealNVP(GenerativeModel):
         """
         x = torch.cat((on, off), dim=1)
         return F.conv_transpose2d(x, order_matrix, stride=2, padding=0)
+
 
     def g(self, z):
         """Transformation g: Z -> X (inverse of f).
@@ -828,7 +806,8 @@ class RealNVP(GenerativeModel):
         for i in reversed(range(len(self.s1_ckbd))):
             x, _ = self.s1_ckbd[i](x, reverse=True)
 
-        return futils.post_process(x)
+        return x
+
 
     def f(self, x):
         """Transformation f: X -> Z (inverse of g).
@@ -840,7 +819,6 @@ class RealNVP(GenerativeModel):
         """
 
         z, log_diag_J = x, torch.zeros_like(x)
-
 
         # SCALE 1: 32(64) x 32(64)
         for i in range(len(self.s1_ckbd)):
@@ -918,6 +896,7 @@ class RealNVP(GenerativeModel):
 
         return z, log_diag_J
 
+
     def sample(self, num_samples=10, device="cpu", seed=0, std=None, fill_with=None, mean=None):
         std = std if std is not None else self.data_info["temp"]
 
@@ -932,6 +911,7 @@ class RealNVP(GenerativeModel):
 
         return z_sample
 
+
     def forward(self, x, preprocess_noise=True):
         x, log_det_pre = futils.pre_process(x, self.data_info, noise=preprocess_noise)
 
@@ -942,9 +922,11 @@ class RealNVP(GenerativeModel):
 
         return log_p, log_det_sum, z_outs
 
+
     def reverse(self, z):
         x_outs = self.g(z)
-        return x_outs
+        return futils.post_process(x_outs)
+
 
     def loss(self, log_prob, log_det):
         weight_scale = None
@@ -966,11 +948,12 @@ class RealNVP(GenerativeModel):
 
         return loss, bpd
 
+
     def moving_avg(self, current_avg, new_value, idx):
         return current_avg + (new_value.mean(dim=0) - current_avg) / idx
 
-    def mask_grad(self, z, grad_mask=None):
 
+    def mask_grad(self, z, grad_mask=None):
         if grad_mask is None:
             return
 
@@ -1043,6 +1026,7 @@ class RealNVP(GenerativeModel):
 
             z.grad.data *= mask
         return
+
 
     def channel_wise_mask(self, mask, s_chan):
         [_, C, _, _] = list(mask.size())

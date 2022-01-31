@@ -1,8 +1,14 @@
 import torch
 import torch.nn.functional as F
 
+from typing import TypeVar, Tuple
+Tensor = TypeVar('torch.tensor')
+
 
 class NeuralNet(torch.nn.Module):
+    """
+    base class for all NN classifiers
+    """
     def __init__(self):
         super().__init__()
 
@@ -19,7 +25,7 @@ class NeuralNet(torch.nn.Module):
                 torch.nn.init.normal_(m.weight, 0, 0.01)
                 torch.nn.init.constant_(m.bias, 0)
 
-    def classify(self, x):
+    def classify(self, x: Tensor) -> Tuple[Tensor, Tensor, Tensor]:
         net_out = self.forward(x)
         acc = F.softmax(net_out, dim=1)
         class_idx = torch.max(net_out, 1)[1]

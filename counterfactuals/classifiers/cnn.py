@@ -1,13 +1,17 @@
 import torch.nn as nn
 import torch
-from normf.nn.base import NeuralNet
+from counterfactuals.classifiers.base import NeuralNet, Tensor
 import torchvision
 
 
 class MNIST_CNN(NeuralNet):
+    """
+    CNN for ten class MNIST classification
+    """
 
-    def __init__(self, in_channels=1, num_classes=10):
-        """CNN Builder."""
+    def __init__(self,
+                 in_channels: int = 1,
+                 num_classes: int = 10):
         super(MNIST_CNN, self).__init__()
 
         self.conv_layer = nn.Sequential(
@@ -41,25 +45,28 @@ class MNIST_CNN(NeuralNet):
             nn.Linear(256, num_classes)
         )
 
-    def forward(self, x):
-        """Perform forward."""
-
+    def forward(self, x: Tensor) -> Tensor:
         # conv layers
-        x = self.conv_layer(x)
+        out = self.conv_layer(x)
 
         # flatten
-        x = x.view(x.size(0), -1)
+        out = out.view(out.size(0), -1)
 
         # fc layer
-        x = self.fc_layer(x)
+        out = self.fc_layer(out)
 
-        return x
+        return out
 
 
 class CNN(NeuralNet):
-    """CNN."""
+    """
+    CNN for (binary) classification for CelebA, CheXpert
+    """
 
-    def __init__(self, in_channels=3, num_classes=2, flattened_size=16384):
+    def __init__(self,
+                 in_channels: int = 3,
+                 num_classes: int = 2,
+                 flattened_size: int = 16384):
         """CNN Builder."""
         super(CNN, self).__init__()
 
@@ -103,7 +110,7 @@ class CNN(NeuralNet):
             nn.Linear(512, num_classes)
         )
 
-    def forward(self, x):
+    def forward(self, x: Tensor) -> Tensor:
         """Perform forward."""
 
         # conv layers
@@ -121,14 +128,20 @@ class CNN(NeuralNet):
 class CelebA_CNN(CNN):
     """CNN."""
 
-    def __init__(self, in_channels=3, num_classes=2, flattened_size=16384):
+    def __init__(self,
+                 in_channels: int = 3,
+                 num_classes: int = 2,
+                 flattened_size: int = 16384):
         """CNN Builder."""
         super(CelebA_CNN, self).__init__(in_channels=in_channels, num_classes=num_classes,
                                          flattened_size=flattened_size)
 
 
 class CheXpert_CNN(CNN):
-    def __init__(self, in_channels=1, num_classes=2, flattened_size=65536):
+    def __init__(self,
+                 in_channels: int = 1,
+                 num_classes: int = 2,
+                 flattened_size: int = 65536):
         """CNN Builder."""
         super(CheXpert_CNN, self).__init__(in_channels=in_channels, num_classes=num_classes,
                                            flattened_size=flattened_size)

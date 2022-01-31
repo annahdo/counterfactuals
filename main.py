@@ -69,7 +69,7 @@ def generative_model(ctx, type, path):
 
 @main.command()
 @click.option('--type', default=None)
-@click.option('--path', default="checkpoints/classifiers/CelebA_CNN_9.pth", help='Path to trained model')
+@click.option('--path', default=None, help='Path to trained model')
 @click.pass_context
 def classifier(ctx, type, path):
     print("-" * 30)
@@ -83,7 +83,7 @@ def classifier(ctx, type, path):
 
     if path is None:
         path = f"checkpoints/classifiers/{type}.pth"
-        os.makedirs(get_dir(path), exist_ok=True)
+        os.makedirs(os.path.dirname(path), exist_ok=True)
 
     _, _, _ = load_checkpoint(path, classifier, ctx.obj.device)
 
@@ -98,7 +98,7 @@ def classifier(ctx, type, path):
 @click.option('--attack_style', default='z', type=click.Choice(['z', 'conv']),
               help="Find conventional adversarial examples in X or counterfacluals in Z")
 @click.option('--num_steps', default=5000, type=int, help='Maximum number of optimizer steps')
-@click.option('--lr', default=1e-2, type=float, help='Learning rate')
+@click.option('--lr', default=5e-2, type=float, help='Learning rate')
 @click.option('--save_at', default=0.99, type=float, help='Stop attack when acc of target class reaches this value')
 @click.option('--target_class', default=1, type=int,
               help='target class that the modified image should be classified as')
@@ -108,10 +108,8 @@ def classifier(ctx, type, path):
 @click.pass_context
 def adv_attack(ctx, attack_style, num_steps, lr, save_at, target_class, image_path, result_dir):
     print("-" * 30)
-    print("Running counterfactual search in Z" if attack_style == 'z' else "Running conventional adv attack in X")
-
     generative_model = ctx.obj.generative_model
-    classifier_model = ctx.obj.classifier
+    classifier_model = ctx.obj.classifier 
     generative_model.eval()
     classifier_model.eval()
 
