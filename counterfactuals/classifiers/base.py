@@ -25,9 +25,4 @@ class NeuralNet(torch.nn.Module):
                 torch.nn.init.normal_(m.weight, 0, 0.01)
                 torch.nn.init.constant_(m.bias, 0)
 
-    def classify(self, x: Tensor) -> Tuple[Tensor, Tensor, Tensor]:
-        net_out = self.forward(x)
-        acc = F.softmax(net_out, dim=1)
-        class_idx = torch.max(net_out, 1)[1]
 
-        return acc, acc[0, class_idx], class_idx

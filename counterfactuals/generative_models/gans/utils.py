@@ -5,12 +5,13 @@ from typing import TypeVar
 from counterfactuals.generative_models.base import GenerativeModel
 
 Tensor = TypeVar('torch.tensor')
+LossFun = TypeVar('torch.nn._Loss')
 
 
 def make_find_z_fun(max_steps: int = 5000,
                     lr: float = 0.1,
                     diff: float = 1e-2,
-                    loss_fun: torch.nn._Loss = torch.nn.MSELoss()):
+                    loss_fun: LossFun = torch.nn.MSELoss()):
     """
     initializes a function with which one can find the GAN latent representations for a given image
 

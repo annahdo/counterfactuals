@@ -27,7 +27,8 @@ def adv_attack(g_model: GenerativeModel,
                save_at: float,
                target_class: int,
                image_path: str,
-               result_dir: str) -> None:
+               result_dir: str,
+               maximize: bool) -> None:
     """
     prepare adversarial attack in X or Z
     run attack
@@ -41,9 +42,10 @@ def adv_attack(g_model: GenerativeModel,
     params = []
     if attack_style == "z":
         # define z as params for derivative wrt to z
-        z = g_model.encode(x).detach()
+        z = g_model.encode(x)
+        z = [z_i.detach() for z_i in z] if isinstance(z, list) else z.detach()
         x_org = x.detach().clone()
-        z_org = [z_i.detach().clone() for z_i in z] if isinstance(z, list) else z.detach().clone()
+        z_org = [z_i.clone() for z_i in z] if isinstance(z, list) else z.clone()
 
         if type(z) == list:
             for z_part in z:
@@ -64,7 +66,8 @@ def adv_attack(g_model: GenerativeModel,
     optimizer = torch.optim.Adam(params=params, lr=lr)
 
     # run the adversarial attack
-    x_prime = run_adv_attack(x, z, optimizer, classifier, g_model, target_class, attack_style, save_at, num_steps)
+    x_prime = run_adv_attack(x, z, optimizer, classifier, g_model, target_class,
+                             attack_style, save_at, num_steps, maximize)
 
     if x_prime is None:
         print("Warning: Maximum number of iterations exceeded! Attack did not reach target value, returned None.")
@@ -104,7 +107,8 @@ def run_adv_attack(x: Tensor,
                    target_class: int,
                    attack_style: str,
                    save_at: float,
-                   num_steps: int) -> Tensor:
+                   num_steps: int,
+                   maximize: bool) -> Tensor:
     """
     run optimization process on x or z for num_steps iterations
     early stopping when save_at is reached
@@ -124,16 +128,29 @@ def run_adv_attack(x: Tensor,
 
             # assert that x is a valid image
             x.data = torch.clip(x.data, min=0.0, max=1.0)
-            prediction = classifier(x)
-            acc = softmax(prediction)[torch.arange(0, x.shape[0]), target]
-            loss = loss_fn(prediction, target)
 
-            progress_bar.set_postfix(acc_target=acc.item(), loss=loss.item(), step=step + 1)
-            progress_bar.update()
+            if "UNet" in type(classifier).__name__:
+                _, regression = classifier(x)
+                # minimize negative regression to maximize regression
+                loss = -regression if maximize else regression
 
-            # early stopping
-            if acc > save_at:
-                return x
+                progress_bar.set_postfix(regression=regression.item(), loss=loss.item(), step=step + 1)
+                progress_bar.update()
+
+                if (maximize and regression.item() > save_at) or (not maximize and regression.item() < save_at):
+                    return x
+
+            else:
+                prediction = classifier(x)
+                acc = softmax(prediction)[torch.arange(0, x.shape[0]), target]
+                loss = loss_fn(prediction, target)
+
+                progress_bar.set_postfix(acc_target=acc.item(), loss=loss.item(), step=step + 1)
+                progress_bar.update()
+
+                # early stopping
+                if acc > save_at:
+                    return x
 
             loss.backward()
             optimizer.step()

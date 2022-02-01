@@ -1,7 +1,11 @@
 import torch.nn as nn
 import torch
-from counterfactuals.classifiers.base import NeuralNet, Tensor
-import torchvision
+from counterfactuals.classifiers.base import NeuralNet
+import torch.nn.functional as F
+
+from typing import TypeVar, Tuple
+
+Tensor = TypeVar('torch.tensor')
 
 
 class MNIST_CNN(NeuralNet):
@@ -56,6 +60,13 @@ class MNIST_CNN(NeuralNet):
         out = self.fc_layer(out)
 
         return out
+
+    def classify(self, x: Tensor) -> Tuple[Tensor, Tensor, Tensor]:
+        net_out = self.forward(x)
+        acc = F.softmax(net_out, dim=1)
+        class_idx = torch.max(net_out, 1)[1]
+
+        return acc, acc[0, class_idx], class_idx
 
 
 class CNN(NeuralNet):
@@ -123,6 +134,13 @@ class CNN(NeuralNet):
         x = self.fc_layer(x)
 
         return x
+
+    def classify(self, x: Tensor) -> Tuple[Tensor, Tensor, Tensor]:
+        net_out = self.forward(x)
+        acc = F.softmax(net_out, dim=1)
+        class_idx = torch.max(net_out, 1)[1]
+
+        return acc, acc[0, class_idx], class_idx
 
 
 class CelebA_CNN(CNN):
