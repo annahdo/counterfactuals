@@ -31,6 +31,7 @@ def get_generative_model(generative_model_type: str,
                 conv_lu=True,
                 data_info=data_info)
 
+            generative_model.to(device)
             return generative_model, "Glow"
 
         elif data_set == "MNIST":
@@ -41,6 +42,7 @@ def get_generative_model(generative_model_type: str,
             prior = distributions.Normal(torch.tensor(0.).to(device), torch.tensor(1.).to(device))
             generative_model = RealNVP(prior, hps, data_info)
 
+            generative_model.to(device)
             return generative_model, "realNVP"
         else:
             assert False, f"ERROR: Combination {generative_model_type} with data_set {data_set} not implemented"
@@ -48,9 +50,13 @@ def get_generative_model(generative_model_type: str,
     elif generative_model_type == "GAN":
         if data_set == "MNIST":
             generative_model = DCGAN(data_info=data_info, find_z=make_find_z_fun(max_steps=3000, lr=0.1, diff=1e-3))
+
+            generative_model.to(device)
             return generative_model, "dcGAN"
         elif data_set == "CelebA":
             generative_model = PGAN(data_info=data_info, find_z=make_find_z_fun(max_steps=2000, lr=0.1, diff=1e-3))
+
+            generative_model.to(device)
             return generative_model, "pGAN"
         else:
             assert False, f"ERROR: Combination {generative_model_type} with data_set {data_set} not implemented"
@@ -58,9 +64,14 @@ def get_generative_model(generative_model_type: str,
     elif generative_model_type == "VAE":
         if data_set == "MNIST":
             generative_model = VAE_MNIST(data_info=data_info)
+
+            generative_model.to(device)
             return generative_model, "cVAE"
+
         elif data_set == "CelebA":
             generative_model = VAE_CelebA(in_channels=3, latent_dim=128, data_info=data_info)
+
+            generative_model.to(device)
             return generative_model, "cVAE"
         else:
             assert False, f"ERROR: Combination {generative_model_type} with data_set {data_set} not implemented"
