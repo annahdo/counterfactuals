@@ -118,10 +118,14 @@ def classifier(ctx, path, unet_type):
 @click.pass_context
 def adv_attack(ctx, attack_style, num_steps, lr, save_at, target_class, image_path, result_dir, maximize):
     print("-" * 30)
-    g_model = ctx.obj.generative_model
     c_model = ctx.obj.classifier
-    g_model.eval()
     c_model.eval()
+
+    if attack_style=="z":
+        g_model = ctx.obj.generative_model
+        g_model.eval()
+    else:
+        g_model = None
 
     counterfactuals.adv.adv_attack(g_model, c_model, ctx.obj.device,
                                    attack_style, ctx.obj.data_info, num_steps, lr, save_at,
