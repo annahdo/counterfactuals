@@ -96,7 +96,9 @@ def adv_attack(g_model: GenerativeModel,
 
     _ = plot_grid_part(all_images, titles=titles, images_per_row=4, cmap=cmaps)
     plt.subplots_adjust(wspace=0.03, hspace=0.01, left=0.03, right=0.97, bottom=0.01, top=0.95)
-    plt.savefig(result_dir + f'{type(g_model).__name__}_overview_{image_name}_{attack_style}.png')
+
+    g_model_name = f"_{type(g_model).__name__}" if g_model is not None else ""
+    plt.savefig(result_dir + f'overview_{image_name}_{attack_style}{g_model_name}_save_at_{save_at}.png')
 
 
 def run_adv_attack(x: Tensor,

@@ -10,7 +10,7 @@ LossFun = TypeVar('torch.nn._Loss')
 
 def make_find_z_fun(max_steps: int = 5000,
                     lr: float = 0.1,
-                    diff: float = 1e-2,
+                    diff: float = 1e-3,
                     loss_fun: LossFun = torch.nn.MSELoss()):
     """
     initializes a function with which one can find the GAN latent representations for a given image
