@@ -5,11 +5,11 @@ Our method finds counterfactuals that are structurally different to the original
 For the example shown below we start from the original image *x* that is classified as *not blond*. The second column shows the image after encoding and decoding with the generative model (note that this can look slightly different (especially for GANs and VAEs)). We run gradient decent, optimizing the latent space representation *z* until the decoded modified image *x'* is classified as blond with a confidence of 0.99.
 The resulting counterfactual shows the same person as in the original image but with blond hair. The heatmap highlights the pixels that changed most in red.
 
-<img src="https://github.com/AnnahDo/Counterfactuals/blob/main/results/overview_CelebA_img_1_z_Glow_save_at_0.99.png" height="150">
+<img src="results/overview_CelebA_img_1_z_Glow_save_at_0.99.png" height="150">
 
 This is in stark contrast to the conventional adversarial examples found by doing gradient ascent in the image space. The modified image *x'* is also classified as blond with confidence 0.99, but to a human observer the image looks very much like the original and only unstructured noise was added.
 
-<img src="https://github.com/AnnahDo/Counterfactuals/blob/main/results/overview_CelebA_img_1_conv_save_at_0.99.png" height="150">
+<img src="results/overview_CelebA_img_1_conv_save_at_0.99.png" height="150">
 
 We test our method on different data sets
 - MNIST (hand written digits)
