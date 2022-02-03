@@ -7,9 +7,9 @@ import torch
 from counterfactuals.generative_models.base import GenerativeModel
 
 
-class DCGAN(GenerativeModel):
+class dcGAN(GenerativeModel):
     def __init__(self, nc=1, nz=100, ngf=32, ndf=32, data_info=None, find_z=None):
-        super(DCGAN, self).__init__(g_model_type="GAN", data_info=data_info)
+        super(dcGAN, self).__init__(g_model_type="GAN", data_info=data_info)
         self.nz = nz
         self.find_z = find_z
         self.generator = nn.Sequential(

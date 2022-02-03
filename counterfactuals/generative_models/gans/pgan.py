@@ -310,9 +310,9 @@ class Discriminator(nn.Module):
         return out[:, 0], out[:, 1:]
 
 
-class PGAN(GenerativeModel):
+class pGAN(GenerativeModel):
     def __init__(self, n_label=1, nz=511, data_info=None, find_z=None):
-        super(PGAN, self).__init__(g_model_type="GAN", data_info=data_info)
+        super(pGAN, self).__init__(g_model_type="GAN", data_info=data_info)
         self.nz = nz
         self.find_z = find_z
 

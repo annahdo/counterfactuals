@@ -4,10 +4,10 @@ from typing import Tuple, Dict
 
 from counterfactuals.generative_models.base import GenerativeModel
 from counterfactuals.generative_models.flows.glow import Glow
-from counterfactuals.generative_models.flows.realnvp import RealNVP
+from counterfactuals.generative_models.flows.realnvp import realNVP
 from counterfactuals.generative_models.flows.utils import Hyperparameters
-from counterfactuals.generative_models.gans.dcgan import DCGAN
-from counterfactuals.generative_models.gans.pgan import PGAN
+from counterfactuals.generative_models.gans.dcgan import dcGAN
+from counterfactuals.generative_models.gans.pgan import pGAN
 from counterfactuals.generative_models.gans.utils import make_find_z_fun
 from counterfactuals.generative_models.vaes.vae import VAE_CelebA, VAE_MNIST
 
@@ -36,17 +36,17 @@ def get_generative_model(generative_model_type: str,
                                   weight_norm=True, coupling_bn=True, affine=True, scale_reg=5e-5)
 
             prior = distributions.Normal(torch.tensor(0.).to(device), torch.tensor(1.).to(device))
-            generative_model = RealNVP(prior, hps, data_info)
+            generative_model = realNVP(prior, hps, data_info)
             return generative_model, "realNVP"
         else:
             assert False, f"ERROR: Combination {generative_model_type} with data_set {data_set} not implemented"
 
     elif generative_model_type == "GAN":
         if data_set == "MNIST":
-            generative_model = DCGAN(data_info=data_info, find_z=make_find_z_fun(max_steps=3000, lr=0.1, diff=1e-3))
+            generative_model = dcGAN(data_info=data_info, find_z=make_find_z_fun(max_steps=3000, lr=0.1, diff=1e-3))
             return generative_model, "dcGAN"
         elif data_set == "CelebA":
-            generative_model = PGAN(data_info=data_info, find_z=make_find_z_fun(max_steps=2000, lr=0.1, diff=1e-3))
+            generative_model = pGAN(data_info=data_info, find_z=make_find_z_fun(max_steps=2000, lr=0.1, diff=1e-3))
             return generative_model, "pGAN"
         else:
             assert False, f"ERROR: Combination {generative_model_type} with data_set {data_set} not implemented"

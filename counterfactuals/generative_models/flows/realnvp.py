@@ -550,7 +550,7 @@ class ChannelwiseCoupling(nn.Module):
         return self.coupling(x, reverse)
 
 
-class RealNVP(GenerativeModel):
+class realNVP(GenerativeModel):
     def __init__(self, prior, hps, data_info):
         """Initializes a RealNVP.
 
@@ -559,7 +559,7 @@ class RealNVP(GenerativeModel):
             prior: prior distribution over latent space Z.
             hps: the set of hyperparameters.
         """
-        super(RealNVP, self).__init__(g_model_type="Flow", data_info=data_info)
+        super(realNVP, self).__init__(g_model_type="Flow", data_info=data_info)
         self.prior = prior
         self.hps = hps
 
