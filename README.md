@@ -3,7 +3,7 @@
 We create counterfactual explanations for image data by doing gradient ascent in the latent space of a generative model.
 Our method finds counterfactuals that are structurally different to the original image and resemble samples from the target class.
 For the example shown below we start from the original image *x* that is classified as *not blond*. The second column shows the image after encoding and decoding with the generative model (note that this can look slightly different (especially for GANs and VAEs)). We run gradient decent, optimizing the latent space representation *z* until the decoded modified image *x'* is classified as blond with a confidence of 0.99.
-The resulting counterfactual shows the same person as in the original iamge but with blond hair.
+The resulting counterfactual shows the same person as in the original image but with blond hair. The heatmap highlights the pixels that changed most in red.
 
 <img src="https://github.com/AnnahDo/Counterfactuals/blob/main/results/overview_CelebA_img_1_z_Glow_save_at_0.99.png" height="150">
 
