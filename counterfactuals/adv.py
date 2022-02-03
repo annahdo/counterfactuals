@@ -1,10 +1,11 @@
 from tqdm import tqdm
-import torch
-import torch.nn as nn
 from PIL import Image
 from matplotlib import pyplot as plt
 import matplotlib
 from typing import TypeVar, Dict
+
+import torch
+import torch.nn as nn
 from torch.optim.optimizer import Optimizer
 
 from counterfactuals.utils import make_dir, get_transforms, torch_to_image, expl_to_image
@@ -63,7 +64,7 @@ def adv_attack(g_model: GenerativeModel,
 
     print("\nRunning counterfactual search in Z ..." if attack_style == 'z'
           else "Running conventional adv attack in X ...")
-    optimizer = torch.optim.Adam(params=params, lr=lr)
+    optimizer = torch.optim.Adam(params=params, lr=lr, weight_decay=0.0)
 
     # run the adversarial attack
     x_prime = run_adv_attack(x, z, optimizer, classifier, g_model, target_class,

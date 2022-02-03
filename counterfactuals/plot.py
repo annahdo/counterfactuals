@@ -2,7 +2,7 @@ import os
 import numpy as np
 
 import matplotlib as mpl
-from typing import List, Dict
+from typing import List
 
 if os.environ.get('DISPLAY', '') == '':
     print('no display found. Using non-interactive Agg backend')

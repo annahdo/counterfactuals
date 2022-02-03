@@ -3,16 +3,12 @@ from argparse import Namespace
 import torch
 import ast
 import os
-from PIL import Image
-from matplotlib import pyplot as plt
 
 import counterfactuals.adv
 import counterfactuals.classifiers.cnn as classifiers
 import counterfactuals.classifiers.unet as unet
-
-from counterfactuals.utils import make_dir, load_checkpoint, get_transforms, torch_to_image
+from counterfactuals.utils import load_checkpoint
 from counterfactuals.data import get_data_info
-from counterfactuals.plot import plot_grid_part
 from counterfactuals.generative_models.factory import get_generative_model
 
 
@@ -62,6 +58,8 @@ def generative_model(ctx, g_type, path):
         path = f"checkpoints/generative_models/{data_set}_{g_model_type}.pth"
 
     _, _, _ = load_checkpoint(path, g_model, ctx.obj.device)
+
+    g_model.to(ctx.obj.device)
 
     ctx.obj.generative_model_name = path.split('/')[-1].split('.pth')[0]
     ctx.obj.generative_model = g_model
@@ -121,7 +119,7 @@ def adv_attack(ctx, attack_style, num_steps, lr, save_at, target_class, image_pa
     c_model = ctx.obj.classifier
     c_model.eval()
 
-    if attack_style=="z":
+    if attack_style == "z":
         g_model = ctx.obj.generative_model
         g_model.eval()
     else:

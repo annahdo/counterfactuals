@@ -1,7 +1,5 @@
 """
-
 Code adapted from https://github.com/fmu2/realNVP
-
 """
 
 import torch

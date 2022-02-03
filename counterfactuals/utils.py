@@ -3,7 +3,7 @@ import numpy as np
 
 import torch
 import torchvision
-from typing import TypeVar, Dict, Tuple
+from typing import TypeVar, Tuple
 
 Tensor = TypeVar('torch.tensor')
 

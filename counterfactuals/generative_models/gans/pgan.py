@@ -1,4 +1,6 @@
-# code adapted from https://github.com/rosinality/progressive-gan-pytorch
+"""
+code adapted from https://github.com/rosinality/progressive-gan-pytorch
+"""
 
 import torch
 

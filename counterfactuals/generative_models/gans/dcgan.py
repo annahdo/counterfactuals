@@ -1,4 +1,6 @@
-# code adapted from https://github.com/AKASHKADEL/dcgan-mnist
+"""
+code adapted from https://github.com/AKASHKADEL/dcgan-mnist
+"""
 
 import torch.nn as nn
 import torch

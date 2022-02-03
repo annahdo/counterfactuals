@@ -1,3 +1,13 @@
 click
+
+numpy
+PIL
+scipy
 torch
 torchvision
+tqdm
+
+matplotlib
+argparse
+ast
+setuptools
