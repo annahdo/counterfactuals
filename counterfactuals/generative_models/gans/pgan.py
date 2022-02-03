@@ -320,7 +320,7 @@ class PGAN(GenerativeModel):
         self.discriminator = Discriminator(n_label=n_label)
 
     def encode(self, x):
-        z = self.generator.sample(x.shape[0])
+        z = self.generator.sample(x.shape[0]).to(x.device)
 
         return self.find_z(self.generator, z, x)
 

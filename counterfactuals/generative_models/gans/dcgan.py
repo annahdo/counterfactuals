@@ -47,7 +47,7 @@ class DCGAN(GenerativeModel):
         )
 
     def encode(self, x):
-        z = torch.randn(x.shape[0], self.nz, 1, 1)
+        z = torch.randn(x.shape[0], self.nz, 1, 1).to(x.device)
 
         return self.find_z(self.generator, z, x)
 
