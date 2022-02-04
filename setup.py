@@ -6,11 +6,13 @@ setup(
     version="1.0",
     packages=find_packages(),
     install_requires=[
-        'torch',
-        'torchvision',
-        'numpy',
-        'matplotlib',
-        'click',
-        'tqdm'
+                        'click',
+                        'matplotlib',
+                        'numpy',
+                        'Pillow',
+                        'scipy',
+                        'torch',
+                        'torchvision',
+                        'tqdm'
     ],
 )
