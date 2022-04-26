@@ -1,6 +1,6 @@
 # HelixFlow
 
-In this notebook we start from a data distribution that lies on a helix embedded in three dimensional space. We train a simple normalizing flow to approximate the data distribution.
+In this notebook we start from a data distribution that lies on a helix embedded in three dimensional space. We train a simple normalizing flow to approximate the data distribution (pretrained models can be downloaded from https://drive.google.com/drive/folders/1PKfKie1KHKRHuZhjSwwiVsCYMitZFvjV?usp=sharing).
 
 <img src="images/learned_distribution.png" width="800" />
 
