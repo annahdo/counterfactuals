@@ -28,7 +28,10 @@ and different (classification) models leading the gradient ascent updates
 - a U-Net for the number of pedestrians present in Mall images
 
 ### Install
-
+Navigate to the cloned directory and excecute
+```
+python setup.py install
+```
 
 ### Download
 The pretrained networks can be downloaded from
