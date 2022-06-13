@@ -95,4 +95,14 @@ When using this Code please cite
   booktitle={ICML Workshop on Invertible Neural Networks, Normalizing Flows, and Explicit Likelihood Models},
   year={2021}
 }
+
+@misc{dombrowski2022diffeomorphic,
+  doi = {10.48550/ARXIV.2206.05075},
+  url = {https://arxiv.org/abs/2206.05075},
+  author = {Dombrowski, Ann-Kathrin and Gerken, Jan E. and Müller, Klaus-Robert and Kessel, Pan},
+  title = {Diffeomorphic Counterfactuals with Generative Models},
+  publisher = {arXiv},
+  year = {2022},
+}
+
 ```
